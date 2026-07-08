@@ -1,16 +1,64 @@
-# React + Vite
+# BreadMall
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+BreadMall is a polished bakery storefront built with React and Vite. It combines a warm landing page experience with a dedicated ordering flow so visitors can browse featured breads, place an order, and complete checkout in a smooth, modern experience.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- A branded landing page with hero content, bakery highlights, testimonials, and contact details
+- A curated featured products section with a clear “Place order” call to action
+- A dedicated order page for browsing products and managing the cart
+- A separate checkout experience with delivery or pickup options
+- Responsive styling designed to feel premium and approachable
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- Vite
+- React Router DOM
+- Custom CSS
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Luwaiz/breadmall.git
+   ```
+2. Move into the project folder:
+   ```bash
+   cd breadmall
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the frontend development server:
+   ```bash
+   npm run dev
+   ```
+5. Start the backend server from a second terminal:
+   ```bash
+   npm run dev:server
+   ```
+6. Open the local URL shown in the terminal for the frontend.
+
+## Available Scripts
+
+- `npm run dev` – start the development server
+- `npm run build` – create a production build
+- `npm run preview` – preview the production build locally
+- `npm run lint` – run ESLint checks
+
+## Project Structure
+
+- `src/pages/` – landing, order, and checkout pages
+- `src/components/` – reusable UI pieces like the hero, product cards, cart, and checkout form
+- `src/data/` – product content and formatting helpers
+- `src/App.css` and `src/index.css` – styling for the storefront
+
+## Future Improvements
+
+- Connect the checkout flow to a real backend or database
+- Add payment integration
+- Introduce order history and admin management

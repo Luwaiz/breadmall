@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import OrderPage from './pages/OrderPage'
 import CheckoutPage from './pages/CheckoutPage'
 import { defaultOrderForm } from './data/products'
+import { submitOrder } from './lib/api'
 
 function App() {
   const [cartItems, setCartItems] = useState([])
@@ -42,17 +43,40 @@ function App() {
     setFormData((current) => ({ ...current, [name]: value }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     if (!cartItems.length) return
 
     setIsSubmitting(true)
-    window.setTimeout(() => {
-      setIsSubmitting(false)
+
+    try {
+      const payload = {
+        customer: {
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          method: formData.method,
+          note: formData.note,
+        },
+        items: cartItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+      }
+
+      await submitOrder(payload)
       setOrderPlaced(true)
       setCartItems([])
       setFormData(defaultOrderForm)
-    }, 800)
+    } catch (error) {
+      console.error(error)
+      window.alert(error.message || 'Unable to place order right now.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const subtotal = useMemo(
