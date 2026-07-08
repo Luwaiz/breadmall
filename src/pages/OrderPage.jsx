@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import CartPanel from '../components/CartPanel'
-import { breadProducts, formatCurrency } from '../data/products'
+import Reveal from '../components/Reveal'
+import { formatCurrency } from '../data/products'
 
-export default function OrderPage({ cartItems, addToCart, updateQuantity, removeFromCart, subtotal }) {
+export default function OrderPage({ products, cartItems, addToCart, updateQuantity, removeFromCart, subtotal }) {
   return (
     <div className="page-shell order-page-shell">
       <div className="page-topbar">
@@ -32,13 +33,13 @@ export default function OrderPage({ cartItems, addToCart, updateQuantity, remove
 
       <div className="order-content-grid">
         <section className="product-catalog">
-          <div className="product-catalog-header">
+          <Reveal as="div" className="product-catalog-header">
             <h3>Our breads</h3>
             <p>Choose from our full bakery range.</p>
-          </div>
+          </Reveal>
           <div className="product-grid compact-grid">
-            {breadProducts.map((product) => (
-              <article className="product-card" key={product.id}>
+            {products.map((product, index) => (
+              <Reveal as="article" className="product-card" key={product.id} delay={index * 60}>
                 <img className="product-image" src={product.image} alt={product.name} />
                 <span className="product-badge">{product.badge}</span>
                 <h3>{product.name}</h3>
@@ -49,7 +50,7 @@ export default function OrderPage({ cartItems, addToCart, updateQuantity, remove
                     Add to cart
                   </button>
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
         </section>

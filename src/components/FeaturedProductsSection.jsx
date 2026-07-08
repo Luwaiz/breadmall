@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom'
 import ProductCard from './ProductCard'
+import Reveal from './Reveal'
 
 export default function FeaturedProductsSection({ products }) {
   const featuredProducts = products.slice(0, 3)
 
   return (
     <section id="breads" className="section">
-      <div className="section-heading">
+      <Reveal as="div" className="section-heading">
         <p className="eyebrow">Featured bakes</p>
         <h2>Our signature breads, made fresh and ready to enjoy.</h2>
-      </div>
+      </Reveal>
 
       <div className="product-grid">
-        {featuredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {featuredProducts.map((product, index) => (
+          <ProductCard key={product.id} product={product} index={index} />
         ))}
       </div>
 

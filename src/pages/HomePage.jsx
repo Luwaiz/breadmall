@@ -1,7 +1,7 @@
 import Header from '../components/Header'
 import HeroSection from '../components/HeroSection'
 import FeaturedProductsSection from '../components/FeaturedProductsSection'
-import { breadProducts } from '../data/products'
+import Reveal from '../components/Reveal'
 
 const testimonials = [
   {
@@ -14,7 +14,7 @@ const testimonials = [
   },
 ]
 
-export default function HomePage() {
+export default function HomePage({ products }) {
   return (
     <div className="page-shell">
       <Header />
@@ -37,7 +37,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <FeaturedProductsSection products={breadProducts} />
+        <FeaturedProductsSection products={products} />
 
         <section id="story" className="story-section">
           <div className="story-card">
@@ -66,17 +66,17 @@ export default function HomePage() {
         </section>
 
         <section className="section testimonials">
-          <div className="section-heading">
+          <Reveal as="div" className="section-heading">
             <p className="eyebrow">What people say</p>
             <h2>Comforting bread and happy customers.</h2>
-          </div>
+          </Reveal>
 
           <div className="testimonial-grid">
-            {testimonials.map((item) => (
-              <article className="testimonial-card" key={item.author}>
+            {testimonials.map((item, index) => (
+              <Reveal as="article" className="testimonial-card" key={item.author} delay={index * 80}>
                 <p>“{item.quote}”</p>
                 <span>{item.author}</span>
-              </article>
+              </Reveal>
             ))}
           </div>
         </section>

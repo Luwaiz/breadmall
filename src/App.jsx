@@ -1,17 +1,31 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import HomePage from './pages/HomePage'
 import OrderPage from './pages/OrderPage'
 import CheckoutPage from './pages/CheckoutPage'
-import { defaultOrderForm } from './data/products'
-import { submitOrder } from './lib/api'
+import AdminPage from './pages/AdminPage'
+import AdminLoginPage from './pages/AdminLoginPage'
+import MyOrdersPage from './pages/MyOrdersPage'
+import { breadProducts, defaultOrderForm } from './data/products'
+import { getProducts, submitOrder } from './lib/api'
 
 function App() {
   const [cartItems, setCartItems] = useState([])
   const [formData, setFormData] = useState(defaultOrderForm)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
+  const [products, setProducts] = useState(breadProducts)
+
+  useEffect(() => {
+    getProducts()
+      .then((data) => {
+        if (data.length) setProducts(data)
+      })
+      .catch((error) => {
+        console.error('Unable to load products from the database, showing defaults.', error)
+      })
+  }, [])
 
   const addToCart = (product) => {
     setCartItems((current) => {
@@ -67,7 +81,17 @@ function App() {
         subtotal,
       }
 
-      await submitOrder(payload)
+      const result = await submitOrder(payload)
+      // Save order ID to localStorage for "My Orders" tracking
+      if (result?.order?._id) {
+        try {
+          const existing = JSON.parse(localStorage.getItem('breadmall_order_ids') || '[]')
+          existing.push(result.order._id)
+          localStorage.setItem('breadmall_order_ids', JSON.stringify(existing))
+        } catch {
+          // silently ignore storage errors
+        }
+      }
       setOrderPlaced(true)
       setCartItems([])
       setFormData(defaultOrderForm)
@@ -92,11 +116,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage products={products} />} />
         <Route
           path="/order"
           element={
             <OrderPage
+              products={products}
               cartItems={cartItems}
               addToCart={addToCart}
               updateQuantity={updateQuantity}
@@ -122,6 +147,9 @@ function App() {
             />
           }
         />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/my-orders" element={<MyOrdersPage />} />
       </Routes>
     </BrowserRouter>
   )

@@ -26,24 +26,26 @@ export default function CheckoutForm({ formData, onChange, onSubmit, isSubmittin
       </label>
 
       <label>
-        Delivery address
-        <textarea
-          name="address"
-          value={formData.address}
-          onChange={onChange}
-          placeholder="No 2 Ezimgbu (Mummy-B) Link Road, Port Harcourt"
-          rows="3"
-          required
-        />
-      </label>
-
-      <label>
         Order method
         <select name="method" value={formData.method} onChange={onChange}>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
         </select>
       </label>
+
+      {formData.method === 'delivery' && (
+        <label>
+          Delivery address
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={onChange}
+            placeholder="No 2 Ezimgbu (Mummy-B) Link Road, Port Harcourt"
+            rows="3"
+            required
+          />
+        </label>
+      )}
 
       <label>
         Notes

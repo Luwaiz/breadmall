@@ -46,7 +46,7 @@ export default function CartPanel({ cartItems, onRemove, onUpdateQuantity, showC
           <strong>{formatCurrency(subtotal)}</strong>
         </div>
         {showCheckoutButton && cartItems.length > 0 ? (
-          <Link className="button primary full" to="/checkout">
+          <Link className="button primary full" to="/checkout" style={{ marginTop: '14px' }}>
             Continue to checkout
           </Link>
         ) : null}

@@ -4,11 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "dev": "node server.js",
-    "dev:server": "node server.js"
+    "dev:server": "node server.js",
+    "seed:products": "node scripts/seedProducts.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.3"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.1"
   }
 }

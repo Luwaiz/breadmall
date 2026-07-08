@@ -21,9 +21,9 @@ export default function HeroSection() {
         </div>
 
         <ul className="hero-points">
-          <li>✓ Freshly baked daily</li>
-          <li>✓ Loved across Nigerian homes</li>
-          <li>✓ Perfect for breakfast, gifting, and sharing</li>
+          <li>Freshly baked daily</li>
+          <li>Loved across Nigerian homes</li>
+          <li>Perfect for breakfast, gifting, and sharing</li>
         </ul>
       </div>
 

@@ -15,6 +15,7 @@ export default function Header() {
         <a href="#home">Home</a>
         <a href="#breads">Our breads</a>
         <a href="#story">Our story</a>
+        <Link to="/my-orders">My Orders</Link>
         <Link to="/order" className="nav-cta">
           Order now
         </Link>

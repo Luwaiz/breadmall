@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { formatCurrency } from '../data/products'
+import Reveal from './Reveal'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, index = 0 }) {
   return (
-    <article className="product-card">
+    <Reveal as="article" className="product-card" delay={index * 80}>
       <img className="product-image" src={product.image} alt={product.name} />
       <span className="product-badge">{product.badge}</span>
       <h3>{product.name}</h3>
@@ -14,6 +15,6 @@ export default function ProductCard({ product }) {
           Place order
         </Link>
       </div>
-    </article>
+    </Reveal>
   )
 }
