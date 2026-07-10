@@ -21,10 +21,13 @@ const ProductSchema = new mongoose.Schema({
   badge: { type: String, default: '' },
   price: { type: Number, required: true },
   image: { type: String, required: true },
+  stock: { type: Number, required: true, min: 0, default: 0 },
   createdAt: { type: Date, default: Date.now },
 })
 
 const Product = mongoose.model('Product', ProductSchema)
+
+const DEFAULT_SEED_STOCK = 20
 
 async function run() {
   await mongoose.connect(mongoUri)
@@ -39,7 +42,7 @@ async function run() {
       skipped += 1
       continue
     }
-    await Product.create(product)
+    await Product.create({ ...product, stock: DEFAULT_SEED_STOCK })
     created += 1
     console.log(`Added: ${product.name}`)
   }

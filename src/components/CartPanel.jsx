@@ -27,7 +27,11 @@ export default function CartPanel({ cartItems, onRemove, onUpdateQuantity, showC
                   −
                 </button>
                 <span>{item.quantity}</span>
-                <button type="button" onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>
+                <button
+                  type="button"
+                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                  disabled={typeof item.stock === 'number' && item.quantity >= item.stock}
+                >
                   +
                 </button>
               </div>

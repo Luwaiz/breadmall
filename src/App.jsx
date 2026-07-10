@@ -7,6 +7,7 @@ import CheckoutPage from './pages/CheckoutPage'
 import AdminPage from './pages/AdminPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import MyOrdersPage from './pages/MyOrdersPage'
+import NotFoundPage from './pages/NotFoundPage'
 import { breadProducts, defaultOrderForm } from './data/products'
 import { getProducts, submitOrder } from './lib/api'
 
@@ -29,12 +30,15 @@ function App() {
 
   const addToCart = (product) => {
     setCartItems((current) => {
+      const maxQty = typeof product.stock === 'number' ? product.stock : Infinity
       const existingItem = current.find((item) => item.id === product.id)
       if (existingItem) {
+        if (existingItem.quantity >= maxQty) return current
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
         )
       }
+      if (maxQty < 1) return current
       return [...current, { ...product, quantity: 1 }]
     })
   }
@@ -44,7 +48,11 @@ function App() {
       if (quantity <= 0) {
         return current.filter((item) => item.id !== id)
       }
-      return current.map((item) => (item.id === id ? { ...item, quantity } : item))
+      return current.map((item) => {
+        if (item.id !== id) return item
+        const maxQty = typeof item.stock === 'number' ? item.stock : Infinity
+        return { ...item, quantity: Math.min(quantity, maxQty) }
+      })
     })
   }
 
@@ -54,7 +62,11 @@ function App() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
-    setFormData((current) => ({ ...current, [name]: value }))
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+      ...(name === 'method' && value === 'pickup' ? { address: '' } : {}),
+    }))
   }
 
   const handleSubmit = async (event) => {
@@ -150,6 +162,7 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/my-orders" element={<MyOrdersPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   )

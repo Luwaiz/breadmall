@@ -59,6 +59,7 @@ const ProductSchema = new mongoose.Schema({
   badge: { type: String, default: '' },
   price: { type: Number, required: true },
   image: { type: String, required: true },
+  stock: { type: Number, required: true, min: 0, default: 0 },
   createdAt: { type: Date, default: Date.now },
 })
 
@@ -141,25 +142,70 @@ app.get('/api/orders/user', async (req, res) => {
   }
 })
 
+class OrderError extends Error {}
+
 app.post('/api/orders', async (req, res) => {
-  const { customer, items, subtotal } = req.body || {}
+  const { customer, items } = req.body || {}
 
   if (!customer || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Order requires customer details and at least one item.' })
   }
 
+  const session = await mongoose.startSession()
+  let savedOrder
+
   try {
-    const newOrder = new Order({
-      customer,
-      items,
-      subtotal: Number(subtotal || 0),
+    await session.withTransaction(async () => {
+      const productIds = items.map((item) => item.id)
+      const products = await Product.find({ id: { $in: productIds } }).session(session)
+      const productMap = new Map(products.map((product) => [product.id, product]))
+
+      const verifiedItems = []
+      let subtotal = 0
+
+      for (const item of items) {
+        const product = productMap.get(item.id)
+        if (!product) {
+          throw new OrderError(`"${item.name || item.id}" is no longer available.`)
+        }
+
+        const quantity = Number(item.quantity)
+        if (!Number.isInteger(quantity) || quantity < 1) {
+          throw new OrderError(`Invalid quantity for "${product.name}".`)
+        }
+
+        const updatedProduct = await Product.findOneAndUpdate(
+          { id: product.id, stock: { $gte: quantity } },
+          { $inc: { stock: -quantity } },
+          { new: true, session },
+        )
+
+        if (!updatedProduct) {
+          throw new OrderError(`Only ${product.stock} of "${product.name}" left in stock.`)
+        }
+
+        verifiedItems.push({
+          id: product.id,
+          name: product.name,
+          quantity,
+          price: product.price,
+        })
+        subtotal += product.price * quantity
+      }
+
+      const newOrder = new Order({ customer, items: verifiedItems, subtotal })
+      savedOrder = await newOrder.save({ session })
     })
 
-    const savedOrder = await newOrder.save()
     res.status(201).json({ message: 'Order received', order: savedOrder })
   } catch (error) {
+    if (error instanceof OrderError) {
+      return res.status(409).json({ message: error.message })
+    }
     console.error('Error saving order:', error)
     res.status(500).json({ message: 'Failed to save order to database.', error: error.message })
+  } finally {
+    session.endSession()
   }
 })
 
@@ -176,10 +222,15 @@ app.get('/api/products', async (_req, res) => {
 
 // Protected Admin Endpoint to add a new product
 app.post('/api/products', verifyAdminToken, async (req, res) => {
-  const { name, description, badge, price, image } = req.body || {}
+  const { name, description, badge, price, image, stock } = req.body || {}
 
-  if (!name || !price || !image) {
-    return res.status(400).json({ message: 'Product requires a name, price, and image.' })
+  if (!name || !price || !image || stock === undefined || stock === '') {
+    return res.status(400).json({ message: 'Product requires a name, price, image, and stock quantity.' })
+  }
+
+  const stockValue = Number(stock)
+  if (!Number.isInteger(stockValue) || stockValue < 0) {
+    return res.status(400).json({ message: 'Stock quantity must be a whole number of 0 or more.' })
   }
 
   try {
@@ -197,6 +248,7 @@ app.post('/api/products', verifyAdminToken, async (req, res) => {
       badge: badge || '',
       price: Number(price),
       image,
+      stock: stockValue,
     })
 
     const savedProduct = await newProduct.save()

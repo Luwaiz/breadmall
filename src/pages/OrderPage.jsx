@@ -38,20 +38,31 @@ export default function OrderPage({ products, cartItems, addToCart, updateQuanti
             <p>Choose from our full bakery range.</p>
           </Reveal>
           <div className="product-grid compact-grid">
-            {products.map((product, index) => (
-              <Reveal as="article" className="product-card" key={product.id} delay={index * 60}>
-                <img className="product-image" src={product.image} alt={product.name} />
-                <span className="product-badge">{product.badge}</span>
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <div className="product-footer">
-                  <strong>{formatCurrency(product.price)}</strong>
-                  <button className="button small" type="button" onClick={() => addToCart(product)}>
-                    Add to cart
-                  </button>
-                </div>
-              </Reveal>
-            ))}
+            {products.map((product, index) => {
+              const isTracked = typeof product.stock === 'number'
+              const isOutOfStock = isTracked && product.stock <= 0
+              const isLowStock = isTracked && product.stock > 0 && product.stock <= 5
+
+              return (
+                <Reveal as="article" className="product-card" key={product.id} delay={index * 60}>
+                  <img className="product-image" src={product.image} alt={product.name} />
+                  <span className="product-badge">{product.badge}</span>
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  {isLowStock && <p className="product-stock-note">Only {product.stock} left</p>}
+                  <div className="product-footer">
+                    <strong>{formatCurrency(product.price)}</strong>
+                    {isOutOfStock ? (
+                      <span className="product-out-of-stock">Out of stock</span>
+                    ) : (
+                      <button className="button small" type="button" onClick={() => addToCart(product)}>
+                        Add to cart
+                      </button>
+                    )}
+                  </div>
+                </Reveal>
+              )
+            })}
           </div>
         </section>
 

@@ -504,6 +504,19 @@
   font-weight: 700;
 }
 
+.product-stock-note {
+  margin: 6px 14px 0;
+  color: #d97706;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.product-out-of-stock {
+  color: #c53030;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 /* =====================================================
    STORY SECTION
    ===================================================== */
@@ -937,6 +950,15 @@
 
 .cart-controls button:hover {
   background: var(--accent-bg-hover);
+}
+
+.cart-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cart-controls button:disabled:hover {
+  background: var(--accent-bg);
 }
 
 .text-link {

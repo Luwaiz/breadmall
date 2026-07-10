@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { createProduct, getOrders, getProducts } from '../lib/api'
 import { formatCurrency } from '../data/products'
 
-const emptyProductForm = { name: '', description: '', badge: '', price: '', image: '' }
+const emptyProductForm = { name: '', description: '', badge: '', price: '', image: '', stock: '' }
 
 function getAdminToken() {
   return localStorage.getItem('breadmall_admin_token')
@@ -77,11 +77,17 @@ export default function AdminPage() {
       const result = await createProduct({
         ...productForm,
         price: Number(productForm.price),
+        stock: Number(productForm.stock),
       })
       setProducts((current) => [...current, result.product])
       setProductForm(emptyProductForm)
     } catch (err) {
-      setProductError(err.message || 'Failed to add product.')
+      if (err.message?.includes('Session expired') || err.message?.includes('Access denied')) {
+        localStorage.removeItem('breadmall_admin_token')
+        navigate('/admin/login', { replace: true })
+      } else {
+        setProductError(err.message || 'Failed to add product.')
+      }
     } finally {
       setIsAddingProduct(false)
     }
@@ -200,6 +206,20 @@ export default function AdminPage() {
               />
             </label>
 
+            <label>
+              Stock quantity
+              <input
+                name="stock"
+                type="number"
+                min="0"
+                step="1"
+                value={productForm.stock}
+                onChange={handleProductFormChange}
+                placeholder="20"
+                required
+              />
+            </label>
+
             {productError && <p style={{ color: '#c53030', margin: 0 }}>{productError}</p>}
 
             <button className="button primary full" type="submit" disabled={isAddingProduct}>
@@ -217,6 +237,15 @@ export default function AdminPage() {
                   <p>{product.description}</p>
                   <div className="product-footer">
                     <strong>{formatCurrency(product.price)}</strong>
+                    <span
+                      style={{
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: product.stock <= 0 ? '#c53030' : product.stock <= 5 ? '#d97706' : 'var(--muted)',
+                      }}
+                    >
+                      {product.stock <= 0 ? 'Out of stock' : `${product.stock} in stock`}
+                    </span>
                   </div>
                 </article>
               ))}
@@ -300,9 +329,11 @@ export default function AdminPage() {
                   <p style={{ margin: '0 0 0.35rem 0', color: 'var(--muted)', fontSize: '0.95rem' }}>
                     <strong style={{ color: 'var(--text)' }}>Phone:</strong> {order.customer?.phone}
                   </p>
-                  <p style={{ margin: '0 0 0.35rem 0', color: 'var(--muted)', fontSize: '0.95rem' }}>
-                    <strong style={{ color: 'var(--text)' }}>Address:</strong> {order.customer?.address}
-                  </p>
+                  {order.customer?.address && (
+                    <p style={{ margin: '0 0 0.35rem 0', color: 'var(--muted)', fontSize: '0.95rem' }}>
+                      <strong style={{ color: 'var(--text)' }}>Address:</strong> {order.customer.address}
+                    </p>
+                  )}
                   {order.customer?.note && (
                     <div style={{
                       marginTop: '0.75rem',
